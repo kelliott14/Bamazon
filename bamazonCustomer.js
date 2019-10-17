@@ -6,6 +6,9 @@ var mySQL = require("mysql");
 var inquirer = require("inquirer");
 
 var selection = ["All"];
+var itemPurchased;
+var itemQtyPurchased;
+var totalPrice;
 
 var connection = mySQL.createConnection({
     host: 'localhost',
@@ -29,7 +32,7 @@ function start(){
             name: "command",
             type: "list",
             message: "How can I help you today?",
-            choices: ["Browse", "Search by item_id", "Exit"]
+            choices: ["Browse", "Search by item_id", "Buy an item", "Exit"]
         }
     ]).then(function(answer){
         switch (answer.command){
@@ -39,6 +42,10 @@ function start(){
 
             case "Search by item_id":
                 searchByID();
+            break
+
+            case "Buy an item":
+                buyItems()
             break
 
             case "Exit":
@@ -162,7 +169,98 @@ function browseAgain(){
                 
                 case "Main Menu":
                     start();
-                }
-            })
+        }
+    })
+}
 
+function buyItems(){
+    inquirer.prompt([
+        {
+            name: "purchase",
+            message: "Enter the item_id of the product you'd like to purchase",
+            type: "number"
+        }
+    ]).then(function(answer){
+        connection.query("select * from bamazon_db.products where item_id = " + answer.purchase, function(err, results){
+            if (err) throw err;
+
+            if(!results[0]){
+                console.log("That item_id doesn't exist...");
+                buyItems();
+            }else{
+                itemPurchased = answer.purchase;
+                console.log("\n\n-----ITEM_ID: " + answer.purchase + "-----\n " +
+                    results[0].item_id + " | " + results[0].product_name +
+                    "\n Category: " + results[0].department_name + 
+                    "\n Price: $" + results[0].price + "\n\n");
+
+                inquirer.prompt([
+                    {
+                        name: "quantity",
+                        message: "Enter the quantity required",
+                        type: "number"
+                    }
+                ]).then(function(answer){
+                    itemQtyPurchased = answer.quantity;
+                    totalPrice = itemQtyPurchased * results[0].price;
+                    console.log("\n------YOUR ORDER:------" + 
+                    "\nItem: " + results[0].item_id + " | " + 
+                    "Product: " + results[0].product_name + " | " + 
+                    "Unit Price: $" + results[0].price + " | " +
+                    "Qty: " + itemQtyPurchased + 
+                    "\nTotal: $" + totalPrice + "\n");
+
+                    inquirer.prompt([
+                        {
+                            name: "confirm",
+                            message: "Confirm your order?",
+                            type: "confirm"
+                        }
+                    ]).then(function(answer){
+                        if(!answer.confirm){
+                            console.log("Order cancelled\n\n")
+                            orderAgain();
+                        }else{
+                            if(itemQtyPurchased <= results[0].stock_quantity){
+                                console.log("\nYour order is confirmed!\n")
+                                connection.query("update bamazon_db.products set ? where ?",
+                                [{
+                                    stock_quantity: results[0].stock_quantity - itemQtyPurchased
+                                    },
+                                    {
+                                    item_id: itemPurchased
+                                    }
+                                ]
+                            )
+                            orderAgain();
+                            }else{
+                                console.log("\nInsufficient quantity for this order, please try again with a lower quantity.\n");
+                                orderAgain();
+                            }
+                        }
+                    })
+                })
+            }
+        })
+    })
+}
+
+function orderAgain(){
+    inquirer.prompt([
+        {
+            name: "nextCommand",
+            message: "Where to next?",
+            choices: ["Order Again", "Main Menu"],
+            type: "list"
+        }
+    ]).then(function(answer){
+        switch (answer.nextCommand){
+            case "Order Again":
+                buyItems();
+                break
+                
+                case "Main Menu":
+                    start();
+        }
+    })
 }
