@@ -5,7 +5,7 @@ var password = keys.mySQL.password;
 var mySQL = require("mysql");
 var inquirer = require("inquirer");
 
-var selection = ["all"];
+var selection = ["All"];
 
 var connection = mySQL.createConnection({
     host: 'localhost',
@@ -96,24 +96,73 @@ function searchAgain(){
 
 function browseShop(){
     connection.query("select distinct department_name from bamazon_db.products;", function(err, results){
-        if (err) throw err
+            if (err) throw err
 
-        results.forEach(function (item, index){
-            selection.push(item.department_name)
+            results.forEach(function (item, index){
+                selection.push(item.department_name)
+            });
+
+        inquirer.prompt([
+            {
+                name: "display",
+                message: "Which category would you like to see?",
+                choices: selection,
+                type: "list"
+            }
+        ]).then(function(answer){
+            console.log(answer.display)
+            switch(answer.display){
+                case "All":
+                    connection.query("select * from bamazon_db.products order by department_name", function(err, results){
+                        if (err) throw err;
+                        console.log("\n-----ITEM LIST-----")
+                        results.forEach(function (item, index){
+                            console.log("Item: " + item.item_id + 
+                            " | Category: " + item.department_name +
+                            " | Product: " + item.product_name + 
+                            " | Price: $" + item.price);
+                        })
+                        console.log("-------------------")
+                        browseAgain();
+                    })
+                break;
+            
+                default:
+                    connection.query("select * from bamazon_db.products where department_name = '" + answer.display + "'", function(err, results){
+                        if (err) throw err;
+                        console.log("\n-----ITEM LIST-----")
+                        results.forEach(function (item, index){
+                            console.log("Item: " + item.item_id + 
+                            " | Category: " + item.department_name +
+                            " | Product: " + item.product_name + 
+                            " | Price: $" + item.price);
+                        })
+                        console.log("-------------------")
+                        browseAgain();
+                    })
+                break;
+                }
         });
-        
-    
+    })
+}
 
-    console.log(selection)
+function browseAgain(){
     inquirer.prompt([
         {
-            name: "display",
-            message: "Which category would you like to see?",
-            choices: selection,
+            name: "nextCommand",
+            message: "Where to next?",
+            choices: ["Browse Again", "Main Menu"],
             type: "list"
         }
     ]).then(function(answer){
-        console.log(answer.display)
-    })
-});
+        switch (answer.nextCommand){
+            case "Browse Again":
+                browseShop();
+                break
+                
+                case "Main Menu":
+                    start();
+                }
+            })
+
 }
