@@ -5,6 +5,8 @@ var password = keys.mySQL.password;
 var mySQL = require("mysql");
 var inquirer = require("inquirer");
 
+var selection = ["all"];
+
 var connection = mySQL.createConnection({
     host: 'localhost',
     port: 3306,
@@ -90,4 +92,28 @@ function searchAgain(){
                     start();
                 }
             })
+}
+
+function browseShop(){
+    connection.query("select distinct department_name from bamazon_db.products;", function(err, results){
+        if (err) throw err
+
+        results.forEach(function (item, index){
+            selection.push(item.department_name)
+        });
+        
+    
+
+    console.log(selection)
+    inquirer.prompt([
+        {
+            name: "display",
+            message: "Which category would you like to see?",
+            choices: selection,
+            type: "list"
+        }
+    ]).then(function(answer){
+        console.log(answer.display)
+    })
+});
 }
