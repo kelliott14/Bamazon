@@ -1,0 +1,23 @@
+{
+  "name": "Bamazon",
+  "version": "1.0.0",
+  "description": "Boot Camp - Week 12 - Homework - mySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kelliott14/Bamazon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kelliott14/Bamazon/issues"
+  },
+  "homepage": "https://github.com/kelliott14/Bamazon#readme",
+  "dependencies": {
+    "inquirer": "^7.0.0"
+  }
+}
