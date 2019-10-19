@@ -231,8 +231,22 @@ function buyItems(){
                                     item_id: itemPurchased
                                     }
                                 ]
-                            )
-                            orderAgain();
+                                )
+                                var dmName = results[0].department_name
+                                connection.query("SELECT * FROM bamazon_db.departments WHERE department_name = '" + dmName + "'", function(err, results){
+                                    connection.query("UPDATE bamazon_db.departments set ? where ?",
+                                    [{
+                                        product_sales: results[0].product_sales + totalPrice
+                                        },
+                                        {
+                                        department_name: dmName
+                                        }
+                                    ]
+                                    )
+                                    orderAgain();
+                                })
+                                
+
                             }else{
                                 console.log("\nInsufficient quantity for this order, please try again with a lower quantity.\n");
                                 orderAgain();
