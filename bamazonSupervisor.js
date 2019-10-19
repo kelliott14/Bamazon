@@ -16,6 +16,7 @@ function Department(department_id, department_name, over_head_costs, product_sal
 }
 
 var table = [];
+var addDepartment;
 
 var connection = mySQL.createConnection({
     host: 'localhost',
@@ -30,16 +31,16 @@ var connection = mySQL.createConnection({
     console.log("connected as id" + connection.threadId); 
 });
 
+console.log("\n--------MAIN MENU: MANAGER VIEW------------\n");
 start();
 
 function start(){
-    console.log("\n--------MAIN MENU: MANAGER VIEW------------\n");
     inquirer.prompt([
         {
             name: "command",
             type: "list",
             message: "How can I help you today?",
-            choices: ["View Product Sales by Department", "Create New Departmenty", "Exit"]
+            choices: ["View Product Sales by Department", "Create New Department", "Exit"]
         }
     ]).then(function(answer){
         switch (answer.command){
@@ -48,7 +49,7 @@ function start(){
             break
 
             case "Create New Department":
-                viewLowInventory();
+                createNewDepartment();
             break
 
             case "Exit":
@@ -68,5 +69,39 @@ function viewProductSales(){
         })
 
         console.table(table)
+
+        start();
     })
+}
+
+function createNewDepartment(){
+    inquirer.prompt([
+        {
+            name: "department_id",
+            message: "Enter the id of the department",
+            type: "number"
+        },
+        {
+            name: "department_name",
+            message: "Enter the name of the department",
+            type: "input"
+        },
+        {
+            name: "over_head_costs",
+            message: "Enter the department's over head costs",
+            type: "number"
+        }
+    ]).then(function (answer){
+        addDepartment = answer.department_id
+        connection.query("INSERT INTO bamazon_db.departments SET ?",
+        {
+            department_id: answer.department_id,
+            department_name: answer.department_name,
+            over_head_costs: answer.over_head_costs,
+            product_sales: 0
+        })
+        console.log("\nDepartment added. Use Manager view to add products to department.\n")
+
+        viewProductSales();     
+    });
 }

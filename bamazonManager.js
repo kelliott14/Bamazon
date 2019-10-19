@@ -59,17 +59,11 @@ function start(){
 
 function viewAllProducts(){
     
-    connection.query("select * from bamazon_db.products order by department_name", function(err, results){
+    connection.query("select * from bamazon_db.products order by item_id", function(err, results){
         if (err) throw err;
         console.log("\n-----ITEM LIST-----")
-        results.forEach(function (item, index){
-            console.log("Item: " + item.item_id + 
-            " | Category: " + item.department_name +
-            " | Product: " + item.product_name + 
-            " | Qty on Hand: " + item.stock_quantity + 
-            " | Price: $" + item.price);
-        })
-        console.log("-------------------")
+        console.table(results)
+
         viewAllProductsAgain();
     })
 }
@@ -103,14 +97,8 @@ function viewLowInventory(){
                 viewLowInventoryAgain()
             }else{
                 console.log("\n-----LESS THAN 5 ITEMS IN STOCK-----")
-                results.forEach(function (item, index){
-                    console.log("Item: " + item.item_id + 
-                    " | Category: " + item.department_name +
-                    " | Product: " + item.product_name + 
-                    " | Qty on Hand: " + item.stock_quantity + 
-                    " | Price: $" + item.price);
-                })
-                console.log("-------------------")
+                console.table(results)
+                
                 viewLowInventoryAgain();
             }
     });    
