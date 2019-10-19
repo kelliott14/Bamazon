@@ -5,6 +5,9 @@ var password = keys.mySQL.password;
 var mySQL = require("mysql");
 var inquirer = require("inquirer");
 
+var addItem;
+var addQty;
+
 var connection = mySQL.createConnection({
     host: 'localhost',
     port: 3306,
@@ -39,8 +42,8 @@ function start(){
                 viewLowInventory();
             break
 
-            case "Add to Inventor":
-                buyItems()
+            case "Add to Inventory":
+                addInventry();
             break
 
             case "Add New Product":
@@ -48,7 +51,7 @@ function start(){
             break
 
             case "Exit":
-                console.log("\n\n\n\n\n\nExiting Bamazon Manger View...");
+                console.log("\n\n\nExiting Bamazon Manger View...");
                 connection.end();
         }
     })
@@ -125,6 +128,82 @@ function viewLowInventoryAgain(){
         switch (answer.nextCommand){
             case "View Low Inventory Again":
                 viewLowInventory();
+                break
+                
+                case "Main Menu":
+                    start();
+        }
+    })
+}
+
+function addInventry(){
+    inquirer.prompt([
+        {
+            name: "item_id",
+            message: "Enter the item id of the product",
+            type: "number"
+        }
+        ]).then(function (answer){
+            addItem = answer.item_id;
+
+        connection.query("SELECT * FROM bamazon_db.products WHERE item_id = " + answer.item_id, function(err, results){
+            addQty = results[0].stock_quantity;
+
+            console.log("\n--------------------------ITEM--------------------------" + 
+            "\nItem: " + results[0].item_id + 
+            " | Category: " + results[0].department_name +
+            " | Product: " + results[0].product_name + 
+            " | Qty on Hand: " + results[0].stock_quantity + 
+            " | Price: $" + results[0].price + 
+            "\n---------------------------------------------------------\n")
+        
+
+        inquirer.prompt([
+            {
+                name: "qty",
+                message: "Enter the amount of quantity you are adding",
+                type: "number"
+            }
+        ]).then(function (answer){
+
+            connection.query("UPDATE bamazon_db.products SET ? WHERE?",
+            [{
+                stock_quantity: addQty + answer.qty
+            },
+            {
+                item_id: addItem
+            }]
+            )
+            console.log("Qty updated...")
+                
+                connection.query("SELECT * FROM bamazon_db.products WHERE item_id = " + addItem, function(err, results){
+                    console.log("\n--------------------------ITEM--------------------------" + 
+                    "\nItem: " + results[0].item_id + 
+                    " | Category: " + results[0].department_name +
+                    " | Product: " + results[0].product_name + 
+                    " | Qty on Hand: " + results[0].stock_quantity + 
+                    " | Price: $" + results[0].price + 
+                    "\n---------------------------------------------------------\n")
+                    addInventoryAgain();
+                })
+                
+        })
+    })
+})
+}
+
+function addInventoryAgain(){
+    inquirer.prompt([
+        {
+            name: "nextCommand",
+            message: "Where to next?",
+            choices: ["Add to Inventory Again", "Main Menu"],
+            type: "list"
+        }
+    ]).then(function(answer){
+        switch (answer.nextCommand){
+            case "Add to Inventory Again":
+                addInventry();
                 break
                 
                 case "Main Menu":
