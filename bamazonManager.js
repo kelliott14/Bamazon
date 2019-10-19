@@ -130,6 +130,7 @@ function addInventry(){
             name: "item_id",
             message: "Enter the item id of the product",
             type: "number",
+            validate: validNumber
         }
     ]).then(function (answer){
         
@@ -154,7 +155,8 @@ function addInventry(){
                     {
                         name: "qty",
                         message: "Enter the amount of quantity you are adding",
-                        type: "number"
+                        type: "number",
+                        validate: validNumber
                     }
                 ]).then(function (answer){
 
@@ -210,7 +212,8 @@ function addNewProduct(){
         {
             name: "item_id",
             message: "Enter the item id of the product",
-            type: "number"
+            type: "number",
+            validate: validNumber
         },
         {
             name: "product_name",
@@ -225,12 +228,14 @@ function addNewProduct(){
         {
             name: "price",
             message: "Enter the price of the product",
-            type: "number"
+            type: "number",
+            validate: validNumber
         },
         {
             name: "stock_quantity",
             message: "Enter the qty on hand of the product",
-            type: "number"
+            type: "number",
+            validate: validNumber
         }
     ]).then(function (answer){
         addItem = answer.item_id
@@ -275,4 +280,12 @@ function addNewProductAgain(){
                     start();
         }
     });
+}
+
+function validNumber(input){
+    if (typeof input !== number){
+        done ("Must be a number");
+        return
+    }
+    done(null, true)
 }

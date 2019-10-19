@@ -49,19 +49,20 @@ function start(){
             break
 
             case "Exit":
-                console.log("\n\n\n\n\n\nThanks for shopping at Bamazon!");
+                console.log("\n\n\nThanks for shopping at Bamazon!");
                 connection.end();
         }
     })
 };
 
 function searchByID(){
-    //needs validations for NaN
+  
     inquirer.prompt([
         {
             name: "item_id",
             message: "Enter the item_id",
-            type: "number"
+            type: "number",
+            validate: validNumber
         }
     ]).then(function(answer){
         connection.query("SELECT * FROM bamazon_db.products where item_id = " + answer.item_id, function(err, results){
@@ -76,7 +77,7 @@ function searchByID(){
                     "\n Category: " + results[0].department_name + 
                     "\n Price: $" + results[0].price + "\n\n")
             searchAgain();
-        }
+            }
         })
     });
 }
@@ -178,7 +179,8 @@ function buyItems(){
         {
             name: "purchase",
             message: "Enter the item_id of the product you'd like to purchase",
-            type: "number"
+            type: "number",
+            validate: validNumber
         }
     ]).then(function(answer){
         connection.query("select * from bamazon_db.products where item_id = " + answer.purchase, function(err, results){
@@ -198,7 +200,8 @@ function buyItems(){
                     {
                         name: "quantity",
                         message: "Enter the quantity required",
-                        type: "number"
+                        type: "number",
+                        validate: validNumber
                     }
                 ]).then(function(answer){
                     itemQtyPurchased = answer.quantity;
@@ -277,4 +280,12 @@ function orderAgain(){
                     start();
         }
     })
+}
+
+function validNumber(input){
+    if (typeof input !== number){
+        done ("Must be a number");
+        return
+    }
+    done(null, true)
 }
