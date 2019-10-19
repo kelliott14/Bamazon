@@ -92,39 +92,39 @@ function viewAllProductsAgain(){
 }
 
 function viewLowInventory(){
-    connection.query("select * from bamazon_db.products group by stock_quantity having stock_quantity < 10;", function(err, results){
+    connection.query("select * from bamazon_db.products group by stock_quantity having stock_quantity < 5;", function(err, results){
             if (err) throw err;
-
-            if(!results){
-                console.log("All products have more than 5 items in stock.")
+            
+            if(results.length == 0){
+                console.log("\nAll products have more than 5 items in stock.\n")
                 viewLowInventoryAgain()
+            }else{
+                console.log("\n-----LESS THAN 5 ITEMS IN STOCK-----")
+                results.forEach(function (item, index){
+                    console.log("Item: " + item.item_id + 
+                    " | Category: " + item.department_name +
+                    " | Product: " + item.product_name + 
+                    " | Qty on Hand: " + item.stock_quantity + 
+                    " | Price: $" + item.price);
+                })
+                console.log("-------------------")
+                viewLowInventoryAgain();
             }
-            console.log("\n-----LESS THAN 5 ITEMS IN STOCK-----")
-            results.forEach(function (item, index){
-                console.log("Item: " + item.item_id + 
-                " | Category: " + item.department_name +
-                " | Product: " + item.product_name + 
-                " | Qty on Hand: " + item.stock_quantity + 
-                " | Price: $" + item.price);
-            })
-            console.log("-------------------")
-            viewAllProductsAgain();
-        })
-    
+        });    
 }
 
-function viewAllProductsAgain(){
+function viewLowInventoryAgain(){
     inquirer.prompt([
         {
             name: "nextCommand",
             message: "Where to next?",
-            choices: ["View Products Again", "Main Menu"],
+            choices: ["View Low Inventory Again", "Main Menu"],
             type: "list"
         }
     ]).then(function(answer){
         switch (answer.nextCommand){
-            case "View Products Again":
-                viewAllProducts();
+            case "View Low Inventory Again":
+                viewLowInventory();
                 break
                 
                 case "Main Menu":
