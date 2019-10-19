@@ -5,8 +5,17 @@ var password = keys.mySQL.password;
 var mySQL = require("mysql");
 var inquirer = require("inquirer");
 
-var addItem;
-var addQty;
+function Department(department_id, department_name, over_head_costs, product_sales){
+    this.department_id = department_id,
+    this.department_name = department_name,
+    this.over_head_costs = over_head_costs,
+    this.product_sales = product_sales,
+    this.total_profit = function(){
+         return this.total_profit = this.product_sales - this.over_head_costs
+    }
+}
+
+var table = [];
 
 var connection = mySQL.createConnection({
     host: 'localhost',
@@ -35,7 +44,7 @@ function start(){
     ]).then(function(answer){
         switch (answer.command){
             case "View Product Sales by Department":
-                viewAllProducts();
+                viewProductSales();
             break
 
             case "Create New Department":
@@ -48,3 +57,16 @@ function start(){
         }
     })
 };
+
+function viewProductSales(){
+    connection.query("SELECT * FROM bamazon_db.departments", function(err, results){
+        
+        results.forEach(function(item, index){
+            var newDepartment = new Department(item.department_id, item.department_name, item.over_head_costs, item.product_sales)
+            newDepartment.total_profit();
+            table.push(newDepartment)
+        })
+
+        console.table(table)
+    })
+}
