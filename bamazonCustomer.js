@@ -62,7 +62,6 @@ function searchByID(){
             name: "item_id",
             message: "Enter the item_id",
             type: "number",
-            validate: validNumber
         }
     ]).then(function(answer){
         connection.query("SELECT * FROM bamazon_db.products where item_id = " + answer.item_id, function(err, results){
@@ -180,7 +179,6 @@ function buyItems(){
             name: "purchase",
             message: "Enter the item_id of the product you'd like to purchase",
             type: "number",
-            validate: validNumber
         }
     ]).then(function(answer){
         connection.query("select * from bamazon_db.products where item_id = " + answer.purchase, function(err, results){
@@ -201,7 +199,6 @@ function buyItems(){
                         name: "quantity",
                         message: "Enter the quantity required",
                         type: "number",
-                        validate: validNumber
                     }
                 ]).then(function(answer){
                     itemQtyPurchased = answer.quantity;
@@ -282,10 +279,3 @@ function orderAgain(){
     })
 }
 
-function validNumber(input){
-    if (typeof input !== number){
-        done ("Must be a number");
-        return
-    }
-    done(null, true)
-}

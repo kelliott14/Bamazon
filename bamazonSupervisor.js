@@ -80,7 +80,6 @@ function createNewDepartment(){
             name: "department_id",
             message: "Enter the id of the department",
             type: "number",
-            validate: validNumber
         },
         {
             name: "department_name",
@@ -91,7 +90,6 @@ function createNewDepartment(){
             name: "over_head_costs",
             message: "Enter the department's over head costs",
             type: "number",
-            validate: validNumber
         }
     ]).then(function (answer){
         addDepartment = answer.department_id
@@ -108,10 +106,3 @@ function createNewDepartment(){
     });
 }
 
-function validNumber(input){
-    if (typeof input !== number){
-        done ("Must be a number");
-        return
-    }
-    done(null, true)
-}
